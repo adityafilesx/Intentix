@@ -1,10 +1,16 @@
+Good. Roman numerals immediately elevate the tone. Clean structure signals disciplined engineering.
+
+Below is your final professional README, fully formatted with Roman numerals and formal technical structuring.
+
 Intentix
+
 Adaptive Motor-Accessible Human–Computer Interaction System
-I. Overview
 
-Intentix is an adaptive assistive interaction system that enables individuals with motor disabilities to control digital devices using eye movement, intentional blinks, and voice commands.
+I. Introduction
 
-It is designed for users whose cognitive intent remains intact but whose motor execution is degraded due to conditions such as:
+Intentix is a real-time assistive interaction system designed to enable individuals with motor disabilities to control digital devices using eye movement, structured blink confirmation, and voice-based automation.
+
+The system supports users whose cognitive intent remains intact while motor execution becomes degraded due to conditions such as:
 
 Amyotrophic Lateral Sclerosis (ALS)
 
@@ -18,214 +24,202 @@ Carpal Tunnel Syndrome (CTS)
 
 Repetitive Strain Injuries (RSI)
 
-Intentix stabilizes noisy motor signals and introduces structured confirmation mechanisms to ensure safe, reliable, and fatigue-aware interaction.
+Intentix preserves user intent by stabilizing noisy motor signals and introducing safe execution mechanisms tolerant to tremors, fatigue, and progressive decline.
 
-II. Problem Context
+II. Problem Statement
 
-Modern digital systems assume precise and sustained motor control. As motor ability declines, cursor positioning, clicking, and typing become unreliable.
+Modern digital systems assume precise and sustained motor control. As motor ability declines, cursor positioning, clicking, and typing become unreliable or inaccessible.
 
-Motor disability exists on a spectrum of signal degradation. Most assistive technologies either require specialized hardware or fail under real-world instability and tremor.
+Motor impairment exists on a spectrum of signal degradation rather than as a binary condition. Existing assistive technologies often require specialized hardware or fail under real-world instability.
 
-Intentix addresses this by redesigning interaction around degraded motor signals rather than ideal precision.
+Intentix addresses this limitation by redesigning interaction around degraded motor signals instead of ideal physical precision.
 
-III. Core Capabilities
+III. System Overview
 
-Real-time eye-gaze tracking
+Intentix operates through a layered processing model:
 
-Stabilized cursor mapping with tremor filtering
+Input Acquisition → Signal Processing → Intent Interpretation → Execution → Feedback
 
-Multi-stage blink confirmation model
+Each layer is modular, independently maintainable, and scalable.
 
-Voice-based daily task automation
+IV. System Architecture
+A. Input Acquisition Layer
 
-Fatigue-aware blink monitoring
+Responsible for collecting raw signals from:
 
-Safety-first execution workflow
+Webcam (video stream)
 
-IV. Technology Stack
+Microphone (audio stream)
+
+Frames and audio samples are buffered and passed to processing modules in real time.
+
+B. Vision Processing Layer
+
+This layer transforms raw visual input into structured motor signals.
+
+1. Facial Landmark Detection
+
+MediaPipe Face Mesh extracts facial and iris landmarks.
+
+2. Gaze Estimation
+
+Iris coordinates are mapped to screen coordinates using interpolation.
+
+Relative gaze movement is converted into cursor position.
+
+3. Cursor Stabilization
+To handle tremor and involuntary micro-movements:
+
+Exponential Moving Average smoothing
+
+Dead-zone filtering
+
+Motion damping
+
+4. Blink Detection
+
+Eye Aspect Ratio (EAR) is computed per frame.
+
+Threshold and duration checks distinguish intentional blinks from natural ones.
+
+Cooldown logic prevents repetitive triggering.
+
+C. Intent Interpretation Layer
+
+Combines:
+
+Stabilized gaze coordinates
+
+Blink state machine
+
+Parsed voice commands
+
+Implements a three-stage confirmation mechanism:
+
+Idle → Focus → Lock → Execute
+
+This structured lock-in model reduces accidental input and enhances safety.
+
+D. Execution Layer
+
+Converts validated intent into system-level actions:
+
+Cursor movement
+
+Mouse clicks
+
+Keyboard typing
+
+Scrolling
+
+Email automation
+
+Alarm scheduling
+
+Automation is performed using OS-level control libraries such as PyAutoGUI.
+
+Safety checks are applied before executing critical operations.
+
+E. Feedback Layer
+
+Provides:
+
+Visual focus indication
+
+Lock confirmation
+
+Execution acknowledgment
+
+Fatigue warnings
+
+This ensures transparency and user awareness of system state.
+
+V. Real-Time Processing Flow
+
+The system runs a continuous loop:
+
+I. Capture video frame
+II. Detect facial landmarks
+III. Estimate gaze direction
+IV. Apply stabilization
+V. Detect blink event
+VI. Update state machine
+VII. Interpret user intent
+VIII. Execute system action
+IX. Provide feedback
+X. Repeat
+
+Latency is optimized for smooth assistive interaction.
+
+VI. Technology Stack
 A. Computer Vision
 
 MediaPipe Face Mesh
 
 OpenCV
 
-B. Backend Processing
+B. Backend
 
 Python
 
-Real-time processing loop
-
-C. System Automation
+C. Automation
 
 PyAutoGUI
 
 D. Voice Processing
 
-Speech-to-Text engine
+SpeechRecognition
 
-Intent parsing logic
+Natural language parsing logic
 
 E. Frontend
 
 Flask
 
-HTML / CSS / JavaScript
+HTML, CSS, JavaScript
 
-F. Hardware Requirements
+F. Hardware
 
 Standard webcam
 
 Microphone
 
-V. System Architecture
+VII. Codebase Structure
+intentix/
+│
+├── app.py
+├── config.json
+├── requirements.txt
+│
+├── core/
+│   ├── gaze_tracker.py
+│   ├── blink_detector.py
+│   ├── stabilization.py
+│   ├── intent_engine.py
+│   ├── voice_processor.py
+│   └── fatigue_monitor.py
+│
+├── automation/
+│   ├── executor.py
+│   ├── email_service.py
+│   ├── alarm_service.py
+│   └── browser_control.py
+│
+├── ui/
+│   ├── templates/
+│   └── static/
+│
+└── utils/
+    ├── logger.py
+    └── helpers.py
 
-Intentix follows a modular, layered architecture optimized for real-time assistive interaction.
 
-A. High-Level Architecture Flow
-flowchart TD
+This structure ensures separation of concerns, maintainability, and scalability.
 
-    A[User] --> B[Webcam Input]
-    A --> C[Microphone Input]
-
-    B --> D[Video Frame Capture]
-    C --> E[Audio Capture]
-
-    D --> F[Face & Eye Landmark Detection (MediaPipe)]
-    F --> G[Gaze Estimation]
-    G --> H[Cursor Stabilization (EMA + Dead Zone)]
-
-    F --> I[Blink Detection (EAR + Threshold Logic)]
-
-    E --> J[Speech-to-Text Engine]
-    J --> K[Command Parsing]
-
-    H --> L[Intent Interpretation Engine]
-    I --> L
-    K --> L
-
-    L --> M[Action Executor]
-    M --> N[OS-Level Control (PyAutoGUI)]
-    M --> O[Automation Services (Email / Alarm / Search)]
-
-    N --> P[Visual Feedback Layer]
-    O --> P
-    P --> A
-
-B. Layered Architectural Model
-flowchart TB
-
-    subgraph Input Layer
-        A1[Webcam]
-        A2[Microphone]
-    end
-
-    subgraph Vision & Audio Processing
-        B1[Landmark Detection]
-        B2[Gaze Estimation]
-        B3[Blink Detection]
-        B4[Speech Processing]
-        B5[Stabilization Engine]
-    end
-
-    subgraph Intent Layer
-        C1[Intent State Machine]
-        C2[Three-Step Lock-In]
-    end
-
-    subgraph Execution Layer
-        D1[Cursor Control]
-        D2[Keyboard Automation]
-        D3[Task Automation]
-    end
-
-    subgraph Feedback Layer
-        E1[Focus Highlight]
-        E2[Execution Confirmation]
-        E3[Fatigue Monitoring]
-    end
-
-    A1 --> B1
-    A2 --> B4
-    B1 --> B2
-    B2 --> B5
-    B3 --> C1
-    B4 --> C1
-    B5 --> C1
-    C1 --> C2
-    C2 --> D1
-    C2 --> D2
-    C2 --> D3
-    D1 --> E1
-    D2 --> E2
-    D3 --> E3
-
-C. Architectural Layer Explanation
-1. Input Layer
-
-Captures raw video and audio signals from consumer-grade hardware.
-
-2. Vision & Audio Processing Layer
-
-Extracts facial and iris landmarks
-
-Computes Eye Aspect Ratio (EAR)
-
-Applies smoothing and tremor filtering
-
-Converts speech into structured commands
-
-3. Intent Layer
-
-Combines gaze coordinates, blink states, and parsed voice commands
-
-Implements a three-stage confirmation state machine
-
-Produces validated intent objects
-
-4. Execution Layer
-
-Converts intent into OS-level actions
-
-Handles cursor movement, clicks, typing, and automation
-
-Applies confirmation gates for safety
-
-5. Feedback Layer
-
-Displays focus and lock states
-
-Confirms action execution
-
-Monitors blink fatigue patterns
-
-VI. Real-Time Processing Pipeline
-
-Capture frame
-
-Detect landmarks
-
-Estimate gaze
-
-Stabilize cursor
-
-Detect blink
-
-Update state machine
-
-Interpret intent
-
-Execute action
-
-Provide feedback
-
-Repeat
-
-Latency is optimized for smooth assistive interaction.
-
-VII. Installation Guide
+VIII. Installation Guide
 A. Prerequisites
 
-Python 3.8+
+Python 3.8 or higher
 
 Webcam
 
@@ -256,7 +250,7 @@ D. Install Dependencies
 pip install -r requirements.txt
 
 
-Typical dependencies:
+Dependencies include:
 
 opencv-python
 
@@ -270,20 +264,20 @@ speechrecognition
 
 numpy
 
-E. Run Application
+E. Run the Application
 python app.py
 
 
-Open:
+Access the interface at:
 
 http://localhost:5000
 
 
 Grant camera and microphone permissions if prompted.
 
-VIII. Configuration
+IX. Configuration
 
-Configurable parameters:
+System parameters can be configured in config.json, including:
 
 Blink threshold
 
@@ -293,27 +287,25 @@ Cursor smoothing factor
 
 Dead-zone threshold
 
-Emergency contact details
+Emergency contact settings
 
-Stored in config.json.
-
-IX. Security & Safety
+X. Security Considerations
 
 No raw video storage
 
-Fully local processing
+Local processing only
 
 Confirmation required for critical actions
 
-Isolated emergency execution flow
+Isolated emergency workflow
 
-X. Future Scope
+XI. Future Enhancements
 
-Adaptive learning of motor thresholds
+Adaptive threshold learning
 
 Android Accessibility Service implementation
 
-AI-driven predictive intent modeling
+Predictive intent modeling
 
 User profile persistence
 
