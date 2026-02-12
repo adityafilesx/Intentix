@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="SenseWay - Assistive eye-tracking technology for hands-free computer control using gaze and blinks.">
+    <title>SenseWay | Command Center</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👁️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+    <div id="timer-overlay">5</div>
+
+    <!-- Fatigue Alert Toast (calm, auto-dismiss) -->
+    <div id="fatigue-toast" class="fatigue-toast hidden">
+        <span class="fatigue-icon">😌</span>
+        <span class="fatigue-message">You've been blinking a lot. Please slow down and take a short rest.</span>
+    </div>
+
+    <!-- Voice Confirmation Modal -->
+    <div id="voice-confirm-modal" class="modal-overlay hidden">
+        <div class="voice-modal-content">
+            <h3>🎤 Confirm Voice Action</h3>
+            <p id="voice-confirm-message">Confirm this action?</p>
+            <div class="voice-modal-actions">
+                <button class="btn-confirm" onclick="confirmVoiceAction()">✓ YES</button>
+                <button class="btn-deny" onclick="cancelVoiceAction()">✗ NO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Notification -->
+    <div id="reminder-popup" class="reminder-popup hidden">
+        <span class="reminder-icon">⏰</span>
+        <span id="reminder-message">Reminder!</span>
+        <button onclick="dismissReminder()" class="reminder-dismiss">OK</button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal">
+        <div class="modal-content">
+            <h2>SYSTEM CONFIG</h2>
+            <div class="form-group">
+                <label>Emergency Contact Number (+CountryCode)</label>
+                <input type="text" id="conf-contact" placeholder="+919999999999">
+            </div>
+            <div class="form-group">
+                <label>Cursor Scope</label>
+                <select id="conf-scope">
+                    <option value="1.0">Full Screen (100%)</option>
+                    <option value="0.8">Centered Safe Zone (80%)</option>
+                    <option value="0.6">Focused Center (60%)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Blink Sensitivity (Lower = Harder)</label>
+                <input type="number" id="conf-blink" step="0.01" value="0.26" max="0.35" min="0.15">
+            </div>
+            <div class="form-group">
+                <label>Cursor Speed: <span id="speed-value">0.5</span> (Slow → Fast)</label>
+                <input type="range" id="conf-speed" min="0.3" max="1.5" step="0.1" value="0.5" style="width:100%;"
+                    oninput="document.getElementById('speed-value').textContent=this.value">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeSettings()">CANCEL</button>
+                <button class="btn-save" onclick="saveSettings()">SAVE CONFIG</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">SENSEWAY <span style="font-size:0.8rem; color:#555; margin-left:10px;">v3.0</span></div>
+        <div style="display:flex; gap:15px; align-items:center;">
+            <button id="settings-btn" onclick="openSettings()">⚙ CONFIG</button>
+            <div class="status-badge" id="sys-status">
+                <div class="dot"></div>SYSTEM ONLINE
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="work-area">
+            <textarea id="output-area" placeholder="> SELECT A MODE..."></textarea>
+            <div id="keyboard">
+                <!-- Row 1 -->
+                <div class="key" onclick="add('1')">1</div>
+                <div class="key" onclick="add('2')">2</div>
+                <div class="key" onclick="add('3')">3</div>
+                <div class="key" onclick="add('4')">4</div>
+                <div class="key" onclick="add('5')">5</div>
+                <div class="key" onclick="add('6')">6</div>
+                <div class="key" onclick="add('7')">7</div>
+                <div class="key" onclick="add('8')">8</div>
+                <div class="key" onclick="add('9')">9</div>
+                <div class="key" onclick="add('0')">0</div>
+                <!-- Row 2 -->
+                <div class="key" onclick="add('Q')">Q</div>
+                <div class="key" onclick="add('W')">W</div>
+                <div class="key" onclick="add('E')">E</div>
+                <div class="key" onclick="add('R')">R</div>
+                <div class="key" onclick="add('T')">T</div>
+                <div class="key" onclick="add('Y')">Y</div>
+                <div class="key" onclick="add('U')">U</div>
+                <div class="key" onclick="add('I')">I</div>
+                <div class="key" onclick="add('O')">O</div>
+                <div class="key" onclick="add('P')">P</div>
+                <!-- Row 3 -->
+                <div class="key" onclick="add('A')">A</div>
+                <div class="key" onclick="add('S')">S</div>
+                <div class="key" onclick="add('D')">D</div>
+                <div class="key" onclick="add('F')">F</div>
+                <div class="key" onclick="add('G')">G</div>
+                <div class="key" onclick="add('H')">H</div>
+                <div class="key" onclick="add('J')">J</div>
+                <div class="key" onclick="add('K')">K</div>
+                <div class="key" onclick="add('L')">L</div>
+                <div class="key" onclick="add('.')">.</div>
+                <!-- Row 4 -->
+                <div class="key" onclick="add('Z')">Z</div>
+                <div class="key" onclick="add('X')">X</div>
+                <div class="key" onclick="add('C')">C</div>
+                <div class="key" onclick="add('V')">V</div>
+                <div class="key" onclick="add('B')">B</div>
+                <div class="key" onclick="add('N')">N</div>
+                <div class="key" onclick="add('M')">M</div>
+                <div class="key" onclick="add(',')">,</div>
+                <div class="key backspace span-2" onclick="back()">BACK</div>
+                <!-- Row 5 -->
+                <div class="key clear span-2" onclick="clr()">CLR</div>
+                <div class="key nav-key span-2" onclick="moveCursor(-1)">&lt;</div>
+                <div class="key span-4" onclick="add(' ')">SPACE</div>
+                <div class="key nav-key span-2" onclick="moveCursor(1)">&gt;</div>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="camera-card"><img id="camera-feed" src="{{ url_for('video_feed') }}"></div>
+            <div class="action-deck">
+                <h3 style="color: var(--primary-color); margin:0; border-bottom:1px solid #333; padding-bottom:5px;">//
+                    ACTIONS</h3>
+                <button class="action-btn" onclick="sendAction('google')">SEARCH GOOGLE <span>🔍</span></button>
+                <button class="action-btn" onclick="sendAction('youtube')">SEARCH YOUTUBE <span>▶</span></button>
+                <button class="action-btn" onclick="sendAction('type_external')"
+                    style="color: #ff9800; border-color: #ff9800;">TYPE EXTERNAL <span>⌨</span></button>
+
+                <h3
+                    style="color: var(--danger-color); margin:10px 0 0; border-bottom:1px solid #333; padding-bottom:5px;">
+                    // EMERGENCY</h3>
+                <button class="action-btn sos-btn" style="border-color:#555; color:#aaa;"
+                    onclick="alert('Configure Number first!')" id="btn-msg">MSG CONTACT <span>💬</span></button>
+
+                <button class="action-btn sos-btn" style="border-color:#555; color:#aaa;"
+                    onclick="sendAction('emergency_call')" id="btn-dial">EMERGENCY CONTACT <span>📞</span></button>
+
+                <button class="action-btn sos-btn" onclick="confirmAction('emergency_police')">DIAL 100 (POLICE)
+                    <span>👮</span></button>
+                <button class="action-btn sos-btn" onclick="confirmAction('emergency_ambulance')">DIAL 112 (AMB)
+                    <span>🚑</span></button>
+
+                <h3 style="color: #9c27b0; margin:15px 0 8px; border-bottom:1px solid #333; padding-bottom:5px;">
+                    // VOICE CONTROL</h3>
+                <button id="voice-btn" class="action-btn voice-btn" onclick="toggleVoice()">
+                    <span id="voice-icon">🎤</span> <span id="voice-label">START VOICE</span>
+                </button>
+                <div id="voice-status" class="voice-status">Say a command...</div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const textarea = document.getElementById('output-area');
+        const timerOverlay = document.getElementById('timer-overlay');
+        const statusBadge = document.getElementById('sys-status');
+
+        function add(char) { const s = textarea.selectionStart, e = textarea.selectionEnd, t = textarea.value; textarea.value = t.substring(0, s) + char + t.substring(e); textarea.selectionStart = textarea.selectionEnd = s + 1; textarea.focus(); }
+        function back() { const s = textarea.selectionStart, e = textarea.selectionEnd, t = textarea.value; if (s !== e) { textarea.value = t.substring(0, s) + t.substring(e); textarea.selectionStart = textarea.selectionEnd = s; } else if (s > 0) { textarea.value = t.substring(0, s - 1) + t.substring(e); textarea.selectionStart = textarea.selectionEnd = s - 1; } textarea.focus(); }
+        function clr() { textarea.value = ''; textarea.focus(); }
+        function moveCursor(d) { const p = textarea.selectionStart; textarea.setSelectionRange(p + d, p + d); textarea.focus(); }
+
+        function sendAction(a) {
+            const t = textarea.value;
+            if (a === 'type_external') startCountdown();
+            if (a.includes('emergency') || a === 'dial_contact') {
+                const o = statusBadge.innerHTML; statusBadge.style.color = '#ff3b30'; statusBadge.style.borderColor = '#ff3b30'; statusBadge.innerHTML = '⚠ EXECUTING...';
+                setTimeout(() => { statusBadge.style.color = '#ccc'; statusBadge.style.borderColor = '#333'; statusBadge.innerHTML = o; }, 5000);
+            }
+            fetch('/perform_action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: a, text: t }) });
+        }
+
+        function confirmAction(action) {
+            if (confirm("CONFIRM EMERGENCY ACTION? This will dial immediately.")) {
+                sendAction(action);
+            }
+        }
+
+        // Settings Logic
+        const modal = document.getElementById('settings-modal');
+        const contactInput = document.getElementById('conf-contact');
+        const scopeInput = document.getElementById('conf-scope');
+        const blinkInput = document.getElementById('conf-blink');
+        const speedInput = document.getElementById('conf-speed');
+
+        function openSettings() { modal.style.display = 'flex'; }
+        function closeSettings() { modal.style.display = 'none'; }
+
+        function saveSettings() {
+            const data = {
+                emergency_contact: contactInput.value,
+                cursor_scope: scopeInput.value,
+                blink_sensitivity: blinkInput.value,
+                cursor_speed: parseFloat(speedInput.value)
+            };
+
+            fetch('/update_settings', {
+                method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' }
+            }).then(r => r.json()).then(d => {
+                alert('Configuration Saved!');
+                closeSettings();
+                // Update buttons state
+                updateEmergencyButtons(data.emergency_contact);
+            });
+        }
+
+        function updateEmergencyButtons(contact) {
+            const btnMsg = document.getElementById('btn-msg');
+            const btnDial = document.getElementById('btn-dial');
+            if (contact && contact.length > 5) {
+                btnMsg.onclick = () => sendAction('emergency_contact');
+                btnMsg.style.borderColor = '#800000'; btnMsg.style.color = '#ff3b30';
+
+                btnDial.onclick = () => sendAction('emergency_call');
+                btnDial.style.borderColor = '#800000'; btnDial.style.color = '#ff3b30';
+            }
+        }
+
+        function startCountdown() { let c = 5; timerOverlay.style.display = 'block'; timerOverlay.innerText = c; const i = setInterval(() => { c--; if (c > 0) timerOverlay.innerText = c; else { clearInterval(i); timerOverlay.style.display = 'none'; } }, 1000); }
+
+        // ===========================================
+        // FATIGUE MONITORING SYSTEM
+        // ===========================================
+        const fatigueToast = document.getElementById('fatigue-toast');
+        let lastFatigueState = false;
+        let fatigueToastTimeout = null;
+
+        function checkFatigueStatus() {
+            fetch('/fatigue_status')
+                .then(r => r.json())
+                .then(data => {
+                    // Show toast only when entering fatigue state
+                    if (data.should_show_toast && !lastFatigueState) {
+                        showFatigueToast();
+                    }
+                    lastFatigueState = data.is_fatigued;
+                })
+                .catch(err => console.log('Fatigue check failed:', err));
+        }
+
+        function showFatigueToast() {
+            fatigueToast.classList.remove('hidden');
+            fatigueToast.classList.add('visible');
+
+            // Auto-dismiss after 5 seconds
+            if (fatigueToastTimeout) clearTimeout(fatigueToastTimeout);
+            fatigueToastTimeout = setTimeout(() => {
+                fatigueToast.classList.remove('visible');
+                fatigueToast.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Poll fatigue status every 3 seconds
+        setInterval(checkFatigueStatus, 3000);
+
+        // ===========================================
+        // VOICE COMMAND SYSTEM (Web Speech API)
+        // ===========================================
+        const voiceBtn = document.getElementById('voice-btn');
+        const voiceIcon = document.getElementById('voice-icon');
+        const voiceLabel = document.getElementById('voice-label');
+        const voiceStatus = document.getElementById('voice-status');
+        const voiceConfirmModal = document.getElementById('voice-confirm-modal');
+        const voiceConfirmMessage = document.getElementById('voice-confirm-message');
+
+        let recognition = null;
+        let isListening = false;
+        let continuousMode = true; // Auto-restart after each command
+        let micPermissionGranted = false;
+
+        // Browser compatibility check
+        function checkBrowserCompatibility() {
+            const isChrome = /Chrome/.test(navigator.userAgent) && !/Edge|Edg/.test(navigator.userAgent);
+            const isEdge = /Edge|Edg/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+            const isFirefox = /Firefox/.test(navigator.userAgent);
+
+            if (isFirefox) {
+                voiceStatus.innerHTML = '⚠️ Firefox has limited voice support. <b>Use Chrome/Edge for best results.</b>';
+                return false;
+            }
+            if (isSafari) {
+                voiceStatus.innerHTML = '⚠️ Safari may require enabling Web Speech API in settings.';
+            }
+            return true;
+        }
+
+        // Request microphone permission explicitly
+        async function requestMicPermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Stop the stream immediately - we just needed permission
+                stream.getTracks().forEach(track => track.stop());
+                micPermissionGranted = true;
+                voiceStatus.textContent = '🎤 Microphone ready. Click START VOICE to begin.';
+                voiceBtn.disabled = false;
+                return true;
+            } catch (err) {
+                console.error('Microphone permission error:', err);
+                micPermissionGranted = false;
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    voiceStatus.innerHTML = '❌ <b>Microphone access denied.</b> Please allow microphone in browser settings and refresh.';
+                } else if (err.name === 'NotFoundError') {
+                    voiceStatus.innerHTML = '❌ <b>No microphone found.</b> Please connect a microphone.';
+                } else {
+                    voiceStatus.textContent = '❌ Microphone error: ' + err.message;
+                }
+                voiceBtn.disabled = true;
+                return false;
+            }
+        }
+
+        // Initialize Web Speech API
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            checkBrowserCompatibility();
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; // Get one phrase at a time for reliability
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = function () {
+                isListening = true;
+                voiceBtn.classList.add('listening');
+                voiceIcon.textContent = '🔴';
+                voiceLabel.textContent = 'LISTENING...';
+                voiceStatus.textContent = '🎧 Speak now... (e.g., "search cats on google")';
+            };
+
+            recognition.onresult = function (event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                if (interimTranscript) {
+                    voiceStatus.textContent = '💬 "' + interimTranscript + '"...';
+                }
+
+                if (finalTranscript) {
+                    processVoiceCommand(finalTranscript);
+                }
+            };
+
+            recognition.onerror = function (event) {
+                console.error('Speech recognition error:', event.error);
+
+                switch (event.error) {
+                    case 'not-allowed':
+                        voiceStatus.innerHTML = '❌ <b>Microphone access denied.</b> Click the 🔒 icon in address bar to allow.';
+                        voiceBtn.disabled = true;
+                        break;
+                    case 'no-speech':
+                        voiceStatus.textContent = '🔇 No speech detected. Try again.';
+                        break;
+                    case 'audio-capture':
+                        voiceStatus.innerHTML = '❌ <b>No microphone available.</b> Please connect a microphone.';
+                        break;
+                    case 'network':
+                        voiceStatus.textContent = '🌐 Network error. Check your internet connection.';
+                        break;
+                    case 'aborted':
+                        voiceStatus.textContent = '⏹ Voice input stopped.';
+                        break;
+                    default:
+                        voiceStatus.textContent = '⚠️ Error: ' + event.error;
+                }
+                stopListening();
+            };
+
+            recognition.onend = function () {
+                const wasListening = isListening;
+                stopListening();
+
+                // Auto-restart if continuous mode is enabled and user didn't manually stop
+                if (continuousMode && wasListening && micPermissionGranted) {
+                    setTimeout(() => {
+                        if (continuousMode) {
+                            voiceStatus.textContent = '🔄 Ready for next command. Click START VOICE.';
+                        }
+                    }, 500);
+                }
+            };
+
+            // Request mic permission on page load
+            setTimeout(() => requestMicPermission(), 1000);
+
+        } else {
+            voiceStatus.innerHTML = '❌ <b>Voice not supported.</b> Please use Chrome or Edge browser.';
+            voiceBtn.disabled = true;
+        }
+
+        function toggleVoice() {
+            if (isListening) {
+                continuousMode = false; // Manual stop disables auto-restart
+                stopListening();
+            } else {
+                continuousMode = true;
+                startListening();
+            }
+        }
+
+        async function startListening() {
+            // Check/request permission first
+            if (!micPermissionGranted) {
+                const granted = await requestMicPermission();
+                if (!granted) return;
+            }
+
+            if (recognition) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    if (e.name === 'InvalidStateError') {
+                        // Already started, stop and restart
+                        recognition.stop();
+                        setTimeout(() => recognition.start(), 100);
+                    } else {
+                        console.error('Recognition start error:', e);
+                        voiceStatus.textContent = '⚠️ Could not start voice recognition.';
+                    }
+                }
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            voiceBtn.classList.remove('listening');
+            voiceIcon.textContent = '🎤';
+            voiceLabel.textContent = 'START VOICE';
+            if (recognition) {
+                try { recognition.stop(); } catch (e) { }
+            }
+        }
+
+        function processVoiceCommand(text) {
+            voiceStatus.textContent = '⏳ Processing: "' + text + '"';
+
+            fetch('/voice_command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'pending_confirmation') {
+                        // Show confirmation modal
+                        voiceConfirmMessage.textContent = data.description;
+                        voiceConfirmModal.classList.remove('hidden');
+                        voiceStatus.textContent = '❓ Confirm action below...';
+                    } else if (data.status === 'success') {
+                        voiceStatus.textContent = '✅ ' + data.message;
+                    } else if (data.status === 'unknown') {
+                        voiceStatus.innerHTML = '❓ Unknown command. Try: "search X on google", "youtube X", "set reminder in 5 minutes"';
+                    } else if (data.status === 'error') {
+                        voiceStatus.textContent = '❌ ' + (data.message || 'Command failed');
+                    } else {
+                        voiceStatus.textContent = data.message || 'Command processed';
+                    }
+                })
+                .catch(err => {
+                    voiceStatus.textContent = '❌ Error processing command. Check server connection.';
+                    console.error(err);
+                });
+        }
+
+        function confirmVoiceAction() {
+            voiceConfirmModal.classList.add('hidden');
+            fetch('/confirm_action', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    voiceStatus.textContent = '✅ ' + (data.message || 'Action confirmed');
+                });
+        }
+
+        function cancelVoiceAction() {
+            voiceConfirmModal.classList.add('hidden');
+            fetch('/cancel_action', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    voiceStatus.textContent = '❌ ' + (data.message || 'Action cancelled');
+                });
+        }
+
+        // Reminder popup handling
+        const reminderPopup = document.getElementById('reminder-popup');
+        const reminderMessage = document.getElementById('reminder-message');
+
+        function showReminder(message) {
+            reminderMessage.textContent = message || 'Reminder!';
+            reminderPopup.classList.remove('hidden');
+        }
+
+        function dismissReminder() {
+            reminderPopup.classList.add('hidden');
+        }
+
+        window.onload = () => {
+            textarea.focus();
+            // Initial fatigue check
+            checkFatigueStatus();
+        };
+    </script>
+</body>
+
+</html>
