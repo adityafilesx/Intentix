@@ -79,7 +79,7 @@ Core languages, frameworks and libs used in the project:
 
 Intentix is organized into UI, server/API, worker threads for automation, and local device integrations (camera & input automation). The design favors simplicity and local execution (privacy-first).
 
-### Architecture Diagram (Mermaid)
+### Architecture Diagram
 
 > Paste this diagram into a renderer that supports Mermaid (GitHub may render mermaid in some contexts).
 
