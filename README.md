@@ -262,7 +262,8 @@ You can containerize Intentix. Recommended steps for your Dockerfile:
 ```dockerfile
 # Build from a Python base with required system packages
 FROM python:3.10-slim
-RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
@@ -285,12 +286,12 @@ CMD ["python", "main.py"]
 | `TWILIO_SID` | Twilio Account SID | ⬜ Optional |
 | `TWILIO_AUTH` | Twilio Auth Token | ⬜ Optional |
 | `TWILIO_PHONE` | Twilio source phone number | ⬜ Optional |
-| `SETTINGS["emergency_contact"]` | Emergency phone number for WhatsApp/Twilio | ⬜ Optional |
+| `emergency_contact` *(config)* | Emergency phone number for WhatsApp/Twilio — set via `SETTINGS["emergency_contact"]` in `config.json` or app config | ⬜ Optional |
 | `BLINK_SENSITIVITY` | Blink detection threshold | ⬜ Optional |
 | `OVERLAY_ENABLED` | Enable/disable cursor overlay | ⬜ Optional |
 
 > [!WARNING]
-> **Never commit secrets to source control.** Store credentials in a local `.env` file (not committed) or use GitHub Secrets / Vault for CI/CD environments.
+> **Never commit secrets to source control.** Store credentials in a local `.env` file and ensure `.env` is listed in your `.gitignore`. Use GitHub Secrets or Vault for CI/CD environments.
 
 ---
 
@@ -343,7 +344,7 @@ CMD ["python", "main.py"]
 |---|:---:|---|
 | ![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white) | ✅ Supported | Full feature support |
 | ![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white) | ✅ Supported | May require accessibility permissions for pyautogui |
-| ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black) | ✅ Supported | Requires display server; X11 recommended for pyautogui |
+| ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black) | ✅ Supported | Requires X11 display server — **Wayland is not supported** by pyautogui |
 
 > [!NOTE]
 > **macOS:** Grant *Accessibility* and *Camera* permissions to Terminal/Python in System Preferences → Security & Privacy.  
