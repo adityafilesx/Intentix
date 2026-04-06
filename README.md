@@ -1,143 +1,213 @@
-# Intentix
+<div align="center">
 
-Assistive eye-, blink-, and voice-controlled toolkit for hands-free computer control, lightweight automation, and emergency workflows.
+# 👁️ Intentix
 
-Status: WIP / Alpha — update to "Beta" or "Production" when appropriate.
+### *See. Blink. Speak. Control.*
+
+**Assistive eye-, blink-, and voice-controlled toolkit for hands-free computer interaction, lightweight automation, and emergency workflows.**
+
+<br/>
+
+[![Status](https://img.shields.io/badge/Status-Alpha%20%2F%20WIP-orange?style=for-the-badge)](https://github.com/adityafilesx/Intentix)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-Web%20UI-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-Face%20Landmark-0F9D58?style=for-the-badge&logo=google&logoColor=white)](https://mediapipe.dev/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=for-the-badge)](https://github.com/adityafilesx/Intentix)
+
+<br/>
+
+[🚀 Quick Start](#-getting-started) · [✨ Features](#-key-features) · [🏗️ Architecture](#️-system-architecture) · [📖 Usage](#-usage-examples--workflows) · [🤝 Contributing](#-development--contributing)
+
+</div>
 
 ---
 
-## Table of Contents
+## 🌟 Why Intentix?
 
-- [About](#about)
-- [Tech Stack](#tech-stack)
-- [Key Features](#key-features)
-- [System Architecture](#system-architecture)
-  - [Architecture Diagram (Mermaid)](#architecture-diagram-mermaid)
-  - [Components & Data Flow](#components--data-flow)
-- [Repository Structure](#repository-structure)
-- [Text Tag (HTML textarea) — how text flows in Intentix](#text-tag-html-textarea---how-text-flows-in-intentix)
-- [Getting Started](#getting-started)
+> **Intentix** empowers users to interact with their computer using only their **eyes**, **blinks**, and **voice** — no hands required. Built for accessibility research, assistive technology prototypes, and emergency-response workflows.
+
+| 🎯 Hands-Free Control | 🚨 Emergency Helpers | 🧠 Smart Automation |
+|:---:|:---:|:---:|
+| Eye gaze + blink detection | One-blink WhatsApp SOS | Type into any app |
+| Voice command execution | Twilio emergency calls | Background threading |
+
+---
+
+## 📋 Table of Contents
+
+- [✨ Key Features](#-key-features)
+- [🖥️ Demo / Screenshots](#️-demo--screenshots)
+- [🏗️ System Architecture](#️-system-architecture)
+- [🗂️ Repository Structure](#️-repository-structure)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
-  - [Clone](#clone)
-  - [Quick Install & Run](#quick-install--run)
-  - [Docker (optional)](#docker-optional)
-- [Configuration & Environment Variables](#configuration--environment-variables)
-- [Usage Examples & Workflows](#usage-examples--workflows)
-  - [TYPE EXTERNAL (end-to-end)](#type-external-end-to-end)
-  - [Emergency flows (WhatsApp / Twilio)](#emergency-flows-whatsapp--twilio)
-- [Testing & CI Recommendations](#testing--ci-recommendations)
-- [Permissions & Platform Notes](#permissions--platform-notes)
-- [Troubleshooting](#troubleshooting)
-- [Security & Privacy Considerations](#security--privacy-considerations)
-- [Development & Contributing](#development--contributing)
-- [License & Contact](#license--contact)
+  - [Installation](#installation)
+  - [Docker (optional)](#-docker-optional)
+- [⚙️ Configuration & Environment Variables](#️-configuration--environment-variables)
+- [📖 Usage Examples & Workflows](#-usage-examples--workflows)
+- [🧪 Testing & CI](#-testing--ci)
+- [💻 Supported Platforms](#-supported-platforms)
+- [🔧 Troubleshooting](#-troubleshooting)
+- [🔐 Security & Privacy](#-security--privacy)
+- [🗺️ Roadmap](#️-roadmap)
+- [🤝 Development & Contributing](#-development--contributing)
+- [📜 License & Contact](#-license--contact)
 
 ---
 
-## About
+## ✨ Key Features
 
-Intentix provides a local web UI and automation backend to enable hands-free interactions using webcam-based gaze/blink detection (MediaPipe), voice commands, and scripted UI automation (pyautogui). It bundles assistive features and emergency helpers (WhatsApp/Twilio) and is intended for research, accessibility prototypes, and small deployments.
-
-Repository: https://github.com/adityafilesx/Intentix
-
----
-
-## Tech Stack
-
-Core languages, frameworks and libs used in the project:
-
-- Python 3.8+
-  - Flask — web server and UI templates
-  - OpenCV (cv2) — camera capture and image utilities
-  - MediaPipe (tasks/python, vision, face_landmarker) — face, gaze & blink detection
-  - pyautogui — UI automation (typing, key presses)
-  - SpeechRecognition / voice processing modules — voice command capture
-  - Twilio (optional) — programmatic calls/SMS
-  - PyQt5 (optional) — overlay cursor UI
-- Frontend
-  - HTML / CSS / JavaScript (vanilla) — templates under `templates/` and `static/`
-- Optional/Supporting
-  - Docker (for containerized development)
-  - Redis / message queue (recommended for scale)
-  - S3 / object storage (for artifacts)
+| Feature | Description |
+|---|---|
+| 👁️ **Gaze & Blink Detection** | Real-time face landmark tracking via MediaPipe for hands-free control |
+| ⌨️ **Virtual Keyboard** | On-screen keyboard + editable textarea ("Text Tag") as the main text input |
+| 📤 **Type External** | Automatically types textarea content into any focused OS application |
+| 🎙️ **Voice Commands** | Capture and execute voice commands (start/stop, confirm/cancel) |
+| 🚨 **Emergency SOS** | Open WhatsApp Web with a pre-filled message or trigger a Twilio call |
+| 🌐 **Flask Web UI** | Lightweight local web interface for control and configuration |
+| ⚡ **Background Threading** | Non-blocking automation via worker threads |
 
 ---
 
-## Key Features
+## 🖥️ Demo / Screenshots
 
-- Real-time gaze and blink detection (MediaPipe) for hands-free control
-- Virtual on-screen keyboard + editable textarea as main text input ("Text Tag")
-- "Type external" automation: type textarea contents into any focused OS application
-- Voice command capture and execution (start/stop, confirm/cancel)
-- Emergency helpers: open WhatsApp Web with pre-filled message, Twilio call helper
-- Lightweight Flask UI for local control and configuration
-- Background threads for non-blocking automation
+> 📸 *Screenshots and GIFs will be added here as the project matures.*
 
-
-### Components & Data Flow
-
-- Web UI (templates + static)
-  - Renders virtual keyboard and `#output-area` textarea.
-  - Provides buttons triggering actions (type, search, emergency).
-- Flask App (`main.py`)
-  - Serves UI and handles `/perform_action` POST endpoint.
-  - Parses `action` and `text`, dispatches jobs.
-- Background workers (threads)
-  - Execute `execute_type_external`, `auto_send_whatsapp`, `make_twilio_call`, etc.
-  - Avoid blocking the web server while performing IO or UI automation.
-- Camera + ML (MediaPipe)
-  - Detects gaze and blinks to trigger automated UI interactions.
-- pyautogui
-  - Sends keystrokes or presses Enter to the currently focused window (used for TYPE EXTERNAL and WhatsApp flows).
-- External tools
-  - Twilio for calls (optional)
-  - Browser to open Web WhatsApp pre-filled URL
+```
+┌─────────────────────────────────────────────────┐
+│              Intentix Web UI                    │
+│  ┌─────────────────────────────────────────┐   │
+│  │  > SELECT A MODE...                     │   │
+│  │                                         │   │
+│  └─────────────────────────────────────────┘   │
+│                                                 │
+│  [Q][W][E][R][T][Y][U][I][O][P]                │
+│  [A][S][D][F][G][H][J][K][L]                   │
+│  [Z][X][C][V][B][N][M]                         │
+│                                                 │
+│  [ TYPE EXTERNAL ]  [ 🎙️ VOICE ]  [ 🚨 SOS ]  │
+└─────────────────────────────────────────────────┘
+```
 
 ---
 
-## Repository Structure (typical / recommended)
+## 🏗️ System Architecture
 
-A simplified view (adjust if your code layout differs):
+<details>
+<summary>📊 Click to expand Architecture Diagram (Mermaid)</summary>
 
-- main.py — Flask app, action handlers, automation helpers
-- templates/
-  - index.html — main UI
-- static/
-  - styles.css, scripts
-- core/ or modules:
-  - gaze_tracker.py, blink_detector.py, voice_processor.py, fatigue_monitor.py
-- automation/
-  - executor.py, email_service.py, browser_control.py
-- utils/
-  - helpers.py, logger.py
-- requirements.txt
-- config.json / .env (optional)
-- README.md
+```mermaid
+flowchart TD
+    A[👁️ Webcam] --> B[MediaPipe Face Landmarker]
+    B --> C{Blink / Gaze Detected?}
+    C -- Yes --> D[Flask Backend /perform_action]
+    E[🎙️ Microphone] --> F[SpeechRecognition]
+    F --> D
+    G[🖥️ Web UI - Virtual Keyboard] --> D
+    D --> H{Action Type}
+    H -- type_external --> I[⚡ Background Thread]
+    H -- whatsapp_sos --> J[🌐 Browser - WhatsApp Web]
+    H -- twilio_call --> K[📞 Twilio API]
+    I --> L[pyautogui.write → Target App]
+    J --> M[pyautogui.press Enter → Send Message]
+```
+
+</details>
+
+### 🔄 Components & Data Flow
+
+| Component | Role |
+|---|---|
+| **Web UI** (`templates/` + `static/`) | Renders virtual keyboard and `#output-area` textarea; triggers actions |
+| **Flask App** (`main.py`) | Serves UI, handles `/perform_action` POST, parses and dispatches jobs |
+| **Background Workers** | Execute `execute_type_external`, `auto_send_whatsapp`, `make_twilio_call` without blocking |
+| **Camera + MediaPipe** | Detects gaze/blinks to trigger automated interactions |
+| **pyautogui** | Sends keystrokes to the currently focused window (TYPE EXTERNAL, WhatsApp) |
+| **Twilio** *(optional)* | Places emergency voice calls via TwiML |
 
 ---
 
-## Text Tag (HTML textarea) — how text flows in Intentix
+## 🗂️ Repository Structure
 
-Central element: `<textarea id="output-area" placeholder="> SELECT A MODE..."></textarea>`
+```
+Intentix/
+├── main.py                  # Flask app, action handlers, automation helpers
+├── eye_blink.py             # Eye/blink detection logic
+├── fatigue_monitor.py       # Fatigue monitoring module
+├── voice_commands.py        # Voice command capture and processing
+├── tester.py                # Testing utilities
+├── face_landmarker.task     # MediaPipe face landmarker model
+├── requirements.txt         # Python dependencies
+├── templates/
+│   └── index.html           # Main web UI
+├── static/
+│   └── (CSS, JS assets)
+└── README.md
+```
 
-- This is the primary editable field where users compose text or where text arrives from voice commands or processing pipelines.
-- Client-side helpers (JS) manipulate this textarea (`add()`, `back()`, `clr()`, `moveCursor()`).
-- The "TYPE EXTERNAL" action sends the textarea content to the server (`/perform_action`) with `action: "type_external"`. The server spawns a thread that executes `pyautogui.write(text, interval=0.1)` after a short countdown to allow the user to focus a target app.
+> 💡 **Text Tag** — The central UI element is `<textarea id="output-area" placeholder="> SELECT A MODE..."></textarea>`. Client-side helpers (`add()`, `back()`, `clr()`, `moveCursor()`) manipulate it, and the TYPE EXTERNAL action sends its content to the server for `pyautogui.write()`.
 
 ---
 
-## Getting Started
+## 🛠️ Tech Stack
+
+<details>
+<summary>🐍 Python Backend</summary>
+
+| Library | Purpose |
+|---|---|
+| **Flask** | Web server and UI templates |
+| **OpenCV** (`cv2`) | Camera capture and image utilities |
+| **MediaPipe** | Face, gaze & blink detection via face_landmarker |
+| **pyautogui** | UI automation — typing, key presses |
+| **SpeechRecognition** | Voice command capture |
+| **pynput** | Keyboard/mouse input monitoring |
+| **NumPy** | Numerical operations |
+| **Twilio** *(optional)* | Programmatic calls/SMS |
+| **PyQt5** *(optional)* | Overlay cursor UI |
+
+</details>
+
+<details>
+<summary>🌐 Frontend</summary>
+
+| Technology | Purpose |
+|---|---|
+| **HTML / CSS** | UI layout and styling |
+| **Vanilla JavaScript** | Dynamic keyboard, textarea interactions |
+
+</details>
+
+<details>
+<summary>🔧 Optional / Infrastructure</summary>
+
+| Tool | Purpose |
+|---|---|
+| **Docker** | Containerized development |
+| **Redis** | Message queue (recommended for scale) |
+| **S3 / Object Storage** | Artifact storage |
+
+</details>
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Python 3.8 or later
-- pip
-- Webcam (for gaze/blink features)
-- (Optional) Microphone for voice features
-- (Optional) PyQt5 for overlay features
-- (Optional) Twilio account & credentials for call flows
+Before you begin, ensure you have:
 
-### Clone
+- ✅ **Python 3.8+** and **pip**
+- ✅ **Webcam** (for gaze/blink features)
+- ⬜ Microphone *(optional — for voice features)*
+- ⬜ PyQt5 *(optional — for overlay UI)*
+- ⬜ Twilio account *(optional — for emergency call flows)*
+
+### Installation
+
+**1. Clone the repository**
 
 ```bash
 # HTTPS
@@ -149,95 +219,274 @@ git clone git@github.com:adityafilesx/Intentix.git
 cd Intentix
 ```
 
-### Quick Install & Run
-
-1. Create virtual environment and install dependencies:
+**2. Create a virtual environment and install dependencies**
 
 ```bash
 python -m venv .venv
-# macOS/Linux
+
+# macOS / Linux
 source .venv/bin/activate
+
 # Windows
-# .venv\Scripts\activate
+.venv\Scripts\activate
 
 pip install -r requirements.txt
 ```
 
-2. (Optional) Copy environment template:
+**3. (Optional) Configure environment variables**
 
 ```bash
 cp .env.example .env
-# Edit .env with your values (if .env.example exists)
+# Edit .env with your Twilio credentials and settings
 ```
 
-3. Run the app:
+**4. Run the application**
 
 ```bash
 python main.py
 ```
 
-4. Open the UI in a browser:
+**5. Open in your browser**
 
 ```
 http://127.0.0.1:5000/
 ```
 
-Notes:
-- If the MediaPipe face landmarker task file is not present, `main.py` will attempt to download it to the repository directory on first run.
-- If PyQt5 is not installed, overlay features will be disabled (the app prints a warning).
+> [!NOTE]
+> If the MediaPipe face landmarker task file is missing, `main.py` will attempt to download it automatically on first run. If PyQt5 is not installed, overlay features are disabled with a warning.
 
-### Docker (optional)
+### 🐳 Docker (optional)
 
-You can containerize the app. Example Dockerfile / Compose are not included here but recommended steps:
+You can containerize Intentix. Recommended steps for your Dockerfile:
 
-- Build a Python image with required system packages (ffmpeg, libsm6, libxext6, etc.)
-- Install requirements.txt
-- Expose port 5000
-- Mount device access for webcam if needed (use `--device` on docker run, or use host networking)
+```dockerfile
+# Build from a Python base with required system packages
+FROM python:3.10-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
----
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-## Configuration & Environment Variables
+COPY . .
+EXPOSE 5000
+CMD ["python", "main.py"]
+```
 
-Important settings (where/how they're stored may vary — update to match project):
-
-- `TWILIO_SID` — Twilio Account SID (optional)
-- `TWILIO_AUTH` — Twilio Auth Token (optional)
-- `TWILIO_PHONE` — Twilio source phone number (optional)
-- `SETTINGS["emergency_contact"]` — emergency phone number used by WhatsApp/Twilio flows
-- `BLINK_SENSITIVITY` or similar — blink threshold setting (UI exposes a setting)
-- `OVERLAY_ENABLED` — enable/disable cursor overlay
-- Logging level / file path
-
-Store secrets securely (local `.env` not committed, use GitHub Secrets or Vault in CI/CD).
+> [!TIP]
+> For webcam access inside Docker, use `--device /dev/video0` on Linux or host networking mode.
 
 ---
 
-## Usage Examples & Workflows
+## ⚙️ Configuration & Environment Variables
 
-### TYPE EXTERNAL (end-to-end)
+| Variable | Description | Required |
+|---|---|:---:|
+| `TWILIO_SID` | Twilio Account SID | ⬜ Optional |
+| `TWILIO_AUTH` | Twilio Auth Token | ⬜ Optional |
+| `TWILIO_PHONE` | Twilio source phone number | ⬜ Optional |
+| `emergency_contact` *(config)* | Emergency phone number for WhatsApp/Twilio — set via `SETTINGS["emergency_contact"]` in `config.json` or app config | ⬜ Optional |
+| `BLINK_SENSITIVITY` | Blink detection threshold | ⬜ Optional |
+| `OVERLAY_ENABLED` | Enable/disable cursor overlay | ⬜ Optional |
 
-1. Focus the external application window (Notepad, text editor, web form).
-2. In Intentix UI, compose or paste text into the textarea `#output-area`.
-3. Click "TYPE EXTERNAL".
-4. The UI will trigger a short countdown to let you focus the target window.
-5. After countdown, server thread calls `pyautogui.write(text, interval=0.1)` — the text is typed into the focused window.
-
-### Emergency flows (WhatsApp / Twilio)
-
-- WhatsApp:
-  - The app opens a `https://web.whatsapp.com/send?phone=<number>&text=<encoded_message>` URL.
-  - If WhatsApp Web session is logged in, pyautogui presses Enter to send (after a short wait).
-- Twilio:
-  - If Twilio config is present, `make_twilio_call()` can place a call using TwiML to speak an emergency message.
+> [!WARNING]
+> **Never commit secrets to source control.** Store credentials in a local `.env` file and ensure `.env` is listed in your `.gitignore`. Use GitHub Secrets or Vault for CI/CD environments.
 
 ---
 
-## Testing & CI Recommendations
+## 📖 Usage Examples & Workflows
 
-- Unit tests: add tests for core modules (gaze logic, command parsing, automation wrappers).
-- Integration tests: use a headless environment or mocks for `pyautogui` and `webbrowser`.
-- CI pipeline (example):
-  - lint → unit tests → build artifact → (optional) publish
-- For pyautogui-related tests, mock `pyautogui.write` and other side-effecting calls.
+### ⌨️ TYPE EXTERNAL — End-to-End
+
+1. **Focus** the target application window (Notepad, a web form, any text field).
+2. In the **Intentix UI**, compose text in the `#output-area` textarea using the virtual keyboard or voice.
+3. Click **"TYPE EXTERNAL"**.
+4. A **countdown** begins — switch focus to your target window during this time.
+5. After the countdown, `pyautogui.write(text, interval=0.1)` types the text into the focused window.
+
+### 🚨 Emergency Flows
+
+<details>
+<summary>📱 WhatsApp SOS</summary>
+
+1. Intentix opens `https://web.whatsapp.com/send?phone=<number>&text=<encoded_message>`.
+2. If WhatsApp Web is already logged in, `pyautogui` presses **Enter** to send automatically (after a short wait).
+
+</details>
+
+<details>
+<summary>📞 Twilio Emergency Call</summary>
+
+1. Ensure `TWILIO_SID`, `TWILIO_AUTH`, and `TWILIO_PHONE` are set in your environment.
+2. `make_twilio_call()` places a call using TwiML to speak the emergency message to the recipient.
+
+</details>
+
+---
+
+## 🧪 Testing & CI
+
+| Test Type | Approach |
+|---|---|
+| **Unit Tests** | Test core modules: gaze logic, command parsing, automation wrappers |
+| **Integration Tests** | Use headless environment or mock `pyautogui` and `webbrowser` |
+| **CI Pipeline** | `lint → unit tests → build artifact → (optional) publish` |
+
+> [!TIP]
+> For `pyautogui`-related tests, always mock `pyautogui.write` and other side-effecting calls to avoid unintended input events during test runs.
+
+---
+
+## 💻 Supported Platforms
+
+| Platform | Status | Notes |
+|---|:---:|---|
+| ![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white) | ✅ Supported | Full feature support |
+| ![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white) | ✅ Supported | May require accessibility permissions for pyautogui |
+| ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black) | ✅ Supported | Requires X11 display server — **Wayland is not supported** by pyautogui |
+
+> [!NOTE]
+> **macOS:** Grant *Accessibility* and *Camera* permissions to Terminal/Python in System Preferences → Security & Privacy.  
+> **Linux:** Ensure the user has access to `/dev/video0` and a running X11 or Wayland session.  
+> **Windows:** Run as a regular user; avoid UAC-elevated prompts as pyautogui cannot interact with elevated windows.
+
+---
+
+## 🔧 Troubleshooting
+
+<details>
+<summary>📷 Webcam not detected</summary>
+
+- Verify the webcam is connected and not in use by another application.
+- On Linux, check permissions: `ls -l /dev/video*` and add your user to the `video` group.
+- Try changing the camera index in OpenCV: `cv2.VideoCapture(1)` instead of `0`.
+
+</details>
+
+<details>
+<summary>🤖 MediaPipe model file missing</summary>
+
+- On first run, `main.py` attempts to download `face_landmarker.task` automatically.
+- If the download fails, manually download it from [MediaPipe Model Cards](https://developers.google.com/mediapipe/solutions/vision/face_landmarker) and place it in the project root.
+
+</details>
+
+<details>
+<summary>⌨️ TYPE EXTERNAL not working</summary>
+
+- Ensure the target window is focused **before** the countdown ends.
+- On macOS, grant **Accessibility** permissions to Terminal/Python.
+- On Linux, confirm you are running under X11 (pyautogui does not support Wayland directly).
+
+</details>
+
+<details>
+<summary>🎙️ Voice commands not responding</summary>
+
+- Verify microphone access is granted in OS settings.
+- Check that `SpeechRecognition` and its dependencies (e.g., `pyaudio`) are installed.
+- Test with: `python -c "import speech_recognition as sr; print(sr.Microphone.list_microphone_names())"`.
+
+</details>
+
+<details>
+<summary>📦 PyQt5 import error</summary>
+
+- PyQt5 is optional. If it's not installed, overlay features are disabled automatically.
+- Install with: `pip install PyQt5`
+
+</details>
+
+---
+
+## 🔐 Security & Privacy
+
+> [!IMPORTANT]
+> Intentix processes **live webcam video** and **microphone audio** entirely **locally**. No video or audio is transmitted to external servers.
+
+| Consideration | Details |
+|---|---|
+| 🎥 **Camera data** | Processed locally by MediaPipe; never sent externally |
+| 🎙️ **Microphone data** | Processed locally; check SpeechRecognition backend settings |
+| 🔑 **Credentials** | Store Twilio and other secrets in `.env` — never commit to git |
+| 🌐 **Network access** | Only outbound: WhatsApp Web URLs and Twilio API calls |
+| 🛡️ **pyautogui scope** | Intentix controls the currently focused window; be cautious in multi-user environments |
+
+---
+
+## 🗺️ Roadmap
+
+> What's coming next for Intentix:
+
+- [ ] 🖥️ **Multi-monitor support** — gaze tracking across multiple screens
+- [ ] 🌍 **Multilingual voice commands** — expand beyond English
+- [ ] 🧩 **Plugin system** — custom action modules without core changes
+- [ ] 📊 **Usage analytics dashboard** — local stats for accessibility research
+- [ ] 🤖 **AI intent parsing** — NLP-powered command understanding
+- [ ] 🔌 **REST API** — expose Intentix features to external tools
+- [ ] 🧪 **Full test suite** — unit and integration coverage for all modules
+- [ ] 📦 **PyPI package** — install via `pip install intentix`
+
+---
+
+## 🤝 Development & Contributing
+
+Contributions are welcome! Here's how to get started:
+
+**1. Fork and clone**
+
+```bash
+git clone https://github.com/<your-username>/Intentix.git
+cd Intentix
+```
+
+**2. Create a feature branch**
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+**3. Make your changes, then test**
+
+```bash
+python -m pytest  # once tests are available
+```
+
+**4. Commit and push**
+
+```bash
+git commit -m "feat: describe your change"
+git push origin feature/your-feature-name
+```
+
+**5. Open a Pull Request** against `main`.
+
+### Contribution Guidelines
+
+- Follow [PEP 8](https://peps.python.org/pep-0008/) for Python code style.
+- Keep PR scope focused — one feature or fix per PR.
+- Add or update docstrings for any modified functions.
+- Mock side-effecting calls (`pyautogui`, `webbrowser`, `twilio`) in tests.
+- Update this README if your change adds new features or changes setup steps.
+
+---
+
+## 📜 License & Contact
+
+**License:** MIT — see [LICENSE](LICENSE) for details.
+
+**Repository:** [https://github.com/adityafilesx/Intentix](https://github.com/adityafilesx/Intentix)
+
+**Issues & Questions:** Open a [GitHub Issue](https://github.com/adityafilesx/Intentix/issues) for bug reports, feature requests, or questions.
+
+---
+
+<div align="center">
+
+Made with ❤️ for accessibility and assistive technology.
+
+⭐ If Intentix helps you, please consider giving it a star!
+
+</div>
 
